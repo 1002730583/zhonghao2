@@ -1,0 +1,75 @@
+<krpano> 
+<!--  相册插件  STAR  -->
+	<plugin name="tplugin"
+        url="%CURRENTXML%/plugins/thumbnails.swf" 
+        alturl="%CURRENTXML%/plugins/thumbnails.js" 
+        preload="true" 
+        onresized="resizethumbs();showimage-onloaded();"
+    />
+	
+	 <!-- gallery N1 -->
+    <layer name="foto" type="container" keep="true"
+        parent="gallerythumbsbg"
+        align="center" x="0" y="0" width="100%" height="100%" 
+        onloaded="thumbnails.build(foto,gallery[foto].thumb);"
+        thumbsalign="center"
+        activeauto="false"
+        visible="false"
+    >
+        <thumbstyle name="default" onclick="showimage(foto,get(thumbindex));" />
+    </layer>
+    
+    <gallery name="foto" imgactive="0">
+        <thumb name="t1" 
+            caption="苏扬网络荣誉出品" 
+            caption_width="300"
+            descr_css="t1_css" 
+            descr_html="t1_html" 
+            imgurl="%CURRENTXML%/images/foto/1.jpg" 
+            url="%CURRENTXML%/images/foto/thumbs/1.jpg" 
+        />
+        <thumb name="t2" 
+            caption="中联全景" 
+            caption_width="200"
+            imgurl="%CURRENTXML%/images/foto/2.jpg" 
+            url="%CURRENTXML%/images/foto/thumbs/2.jpg" 
+        />
+        <thumb name="t3" imgurl="%CURRENTXML%/images/foto/3.jpg" url="%CURRENTXML%/images/foto/thumbs/3.jpg" />
+        <thumb name="t4" imgurl="%CURRENTXML%/images/foto/4.jpg" url="%CURRENTXML%/images/foto/thumbs/4.jpg" />
+        <thumb name="t5" imgurl="%CURRENTXML%/images/foto/5.jpg" url="%CURRENTXML%/images/foto/thumbs/5.jpg" />
+        <thumb name="t6" imgurl="%CURRENTXML%/images/foto/6.jpg" url="%CURRENTXML%/images/foto/thumbs/6.jpg" />
+        <thumb name="t7" imgurl="%CURRENTXML%/images/foto/7.jpg" url="%CURRENTXML%/images/foto/thumbs/7.jpg" />
+        <thumb name="t8" imgurl="%CURRENTXML%/images/foto/8.jpg" url="%CURRENTXML%/images/foto/thumbs/8.jpg" />
+        <thumb name="t9" imgurl="%CURRENTXML%/images/foto/9.jpg" url="%CURRENTXML%/images/foto/thumbs/9.jpg" />
+		<thumb name="t10" imgurl="%CURRENTXML%/images/foto/10.jpg" url="%CURRENTXML%/images/foto/thumbs/10.jpg" />
+		<thumb name="t11" imgurl="%CURRENTXML%/images/foto/11.jpg" url="%CURRENTXML%/images/foto/thumbs/11.jpg" />
+		<thumb name="t12" imgurl="%CURRENTXML%/images/foto/12.jpg" url="%CURRENTXML%/images/foto/thumbs/12.jpg" />
+    </gallery>    
+
+    <data name="t1_css">
+        p { color:#FFFFFF; font-family:arial; font-size:12px; text-align:left; }
+        .colored { color:#0090FF; }
+    </data>
+
+    <data name="t1_html">
+        <p>　　苏扬网络荣誉出品[br]<span class="colored">咨询电话：18066137916 </span> 欢迎您</p>
+    </data>
+
+    <!-- 相册按钮按钮样式 -->
+    <!--<style name="galbtn" url="%CURRENTXML%/plugins/textfield.swf" keep="true" 
+        align="rightbottom" x="0" y="100" 
+        width="90" height="35"
+        vcenter="true"
+        selectable="false" 
+        borderwidth="1" roundedge="12" 
+        shadow="0.01" shadowrange="9" shadowcolor="0x000000" shadowalpha="1" 
+        css="p {font-size:19px; color:#000000; text-align:center}"
+        onover="set(backgroundcolor,0x91c7ff);"
+        onout="set(backgroundcolor,0xffffff);"
+    />-->
+    <!-- 相册按钮按钮 -->
+		
+    <!--<layer name="btn1" style="galbtn"  html="[p]相册按钮[/p]" onclick="showgallery(foto);" />-->
+	
+	
+</krpano>

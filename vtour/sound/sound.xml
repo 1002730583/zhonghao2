@@ -1,0 +1,17 @@
+<krpano version="1.0.8">
+
+
+	   <plugin name="soundinterface"
+				url="%SWFPATH%/plugins/soundinterface.swf"
+				alturl="%SWFPATH%/plugins/soundinterface.js"
+				rootpath=""
+				preload="true"
+				keep="true"
+				volume="0.6"
+				/>
+
+	   
+		<autorotate enabled="true" waittime="0.5" accel="1.0" speed="0.5" horizon="0.0" tofov="90" />
+
+
+</krpano>

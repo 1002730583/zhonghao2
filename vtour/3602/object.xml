@@ -1,0 +1,123 @@
+
+<!-- 用krpano的onstart属性执行buildframe，这个action有两个参数，第一个参数是图像序列所在的路径，第二个参数是图像总数 -->  
+
+<krpano version="1.0.8.15" onstart="buildframes(%CURRENTXML%/objects/,75);">
+ 
+<!-- 在改变浏览器窗口大小时和缩放全景时执行的两个action，实际上最终都是为了保证环物图片的尺寸在改变窗口大小和缩放全景时保持恰当的比例 -->  	<events onresize="updateframes()" onviewchange="updateframesscale()" />
+ 
+ <!-- 名为frame的style，是针对36个图像plugins要载入的style，可以看到关键的onloaded中执行了updateframesize的action，同时ondown中的domouserotate是实现鼠标拖拽图像实现环物图片切换的关键action -->  	
+	<style name="frame" keep="true" visible="false"
+		align="center"
+		onloaded="updateframesize(get(name));set(plugin[loadingtext].visible,false);"
+		ondown="copy(oldmousex,mouse.x);domouserotate();"
+	/>
+
+<!-- 图片载入中的文字显示，主要是为了安慰用户焦躁的心，这里也可以运用动态热点的方式。或者你直接简单修改html属性中的loading -->  
+	<plugin name="loadingtext" url="plugins/textfield.swf" keep="true" zorder="100" visible="true" enabled="false"
+		preload="true"
+		align="center"
+		autoheight="true"
+		width="100"
+		background="false"
+		html="[p]Loading...[/p]"
+		css="p {color:#FFFFFF; font-family:arial; font-size:16px }"
+	/>
+
+<!-- 设置左右两侧的按钮，用户也可以通过点击按钮来实现环物浏览效果，这个按钮位于右侧，主要功能由ondown中的dorotate实现。使环物逆时针旋转 -->  	
+	<layer name="gallerynext" url="gallerybtns.png" keep="true" 
+		align="right" x="0" y="0" zorder="100"
+		crop="100|0|100|100"
+		onovercrop="100|100|100|100"
+		ondowncrop="100|100|100|100"
+		ondown="set(y,1);dorotate();"
+		onup="set(y,0)"
+		direction="-1"
+	/>
+<!-- 左侧的按钮，使得环物顺时针旋转 -->  	
+	<layer name="galleryprev" url="gallerybtns.png" keep="true" 
+		align="left" x="0" y="0" zorder="100"
+		crop="0|0|100|100"
+		onovercrop="0|100|100|100"
+		ondowncrop="0|100|100|100"
+		ondown="set(y,1);dorotate();"
+		onup="set(y,0)"
+		direction="1"
+	/>	  
+<!-- 这个action就是在krpano的onstart中要执行的，它有两个参数，第一个是路径的前半部分，第二个是图像总数，for是循环36次建立36个图像layer，loadstyle了之前提到的名为frame的style，之后设定全局变量currentframe，也就是当前所在的图像，framecount图像总数，oldmousex为鼠标的旧位置，这样可以通过新旧两个X坐标的对比，实现图像的切换，在执行完这些action之后，就是跳到showframe，这里第一个参数是0，因为不是要执行下一张或上一张图像 -->  	
+	<action name="buildframes">
+		for(set(i,0), i LT %2, inc(i),
+			txtadd(fname,frame,get(i));   
+			txtadd(furl,%1,get(i),.png);
+			addplugin(get(fname));
+			plugin[get(fname)].loadstyle(frame);
+			copy(plugin[get(fname)].url,furl);
+		);
+		set(currentframe,0);
+		set(framecount,%2);
+		set(oldmousex,0);
+		showframe(0);
+	</action>
+ <!-- 图像的原本宽度和高度与当前窗口的宽度与高度进行比较，让图像的宽高度始终适应窗口改变，保持环物图片与窗口大小的相对比例 --> 	
+	<action name="updateframesize">
+		if(plugin[%1].imagewidth GT stagewidth,
+			set(plugin[%1].width,100%);
+			set(plugin[%1].height,prop);
+		,
+			if(plugin[%1].imageheight GT stageheight,
+				set(plugin[%1].width,prop);
+				set(plugin[%1].height,100%);
+			,
+				plugin[%1].resetsize();
+			);
+		);
+	</action>
+<!-- 鼠标滚轮缩放视角时，对36个图像进行统一的缩放操作 -->  	
+	<action name="updateframesscale">
+		for(set(i,0), i LT framecount, inc(i),
+			txtadd(fname,frame,get(i));
+			sub(temp,200,view.fov);
+			div(newscale,temp,70);
+			copy(plugin[get(fname)].scale,newscale);
+		);	
+	</action>
+	<!-- 这个action是一个36次的循环，执行updateframesize，也就是浏览器窗口大小改变是相关的action -->  
+	<action name="updateframes">
+		for(set(i,0), i LT framecount, inc(i),
+			txtadd(fname,frame,get(i));
+			updateframesize(get(fname));
+		);		
+	</action>
+	 <!-- 决定显示哪一张图像的action，这里实际上%1只有三种可能的值，一个是0，这个也就是环物一开始载入时会遇到，另外两个分别是-1和1，分别是控制下一个和上一个图像。fname是当前图像plugin的名字，tempstr的目的就是为了隐藏上一个图像，两个if分别限定currentframe在0与35之间。最后ifnot控制图像完全载入之前的载入中文字显示-->  
+	<action name="showframe">
+		txtadd(fname,frame,get(currentframe));
+		txtadd(tempstr,'set(plugin[',get(fname),'].visible,false);');
+		ifnot(%1 == 0, delayedcall(0.03,get(tempstr)); );
+		add(currentframe,%1);
+		if(currentframe LT 0, sub(currentframe,framecount,1); );
+		if(currentframe == framecount, set(currentframe,0); );
+		txtadd(fname,frame,get(currentframe));
+		set(plugin[get(fname)].visible,true);
+		ifnot(plugin[get(fname)].loaded, set(plugin[loadingtext].visible,true);, set(plugin[loadingtext].visible,false); );
+	</action>
+<!-- 左右两侧按钮按下pressed执行showframe，通过送入-1或者1控制环物是显示上一张还是下一张图像，也就是顺时针还是逆时针旋转。-->  
+	<action name="dorotate">
+		if(pressed,
+			showframe(get(direction));
+			delayedcall(0.05,dorotate(););
+		);
+	</action>
+ <!-- 鼠标拖放控制，通过比较新旧鼠标的X值来判断显示上一张还是下一张图像 -->  
+	<action name="domouserotate">
+		if(pressed,
+			sub(temp,oldmousex,mouse.x);
+			if(temp GT 0, set(temp,1); );
+			if(temp LT 0, set(temp,-1); );
+			showframe(get(temp));
+			copy(oldmousex,mouse.x);
+			delayedcall(0.03,domouserotate(););
+		);
+	</action>
+
+	
+	
+</krpano>

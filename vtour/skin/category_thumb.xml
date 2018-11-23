@@ -1,0 +1,1147 @@
+<krpano >
+	
+<!--自定义旋转视角按钮样式-->
+	 <style name="skin_base1" url="fang.png" />
+	 <style name="skin_glow"
+	       ondown="copy(skin_lockglow,name); skin_buttonglow(get(name)); if(ondown2, ondown2() );"
+	       onover="if(skin_lockglow === null, copy(skin_lockglow,name); skin_buttonglow(get(name),0.3) ); "
+	       onout="if(skin_lockglow === name, ifnot(pressed, skin_buttonglow(null);delete(skin_lockglow); ));"
+	       onup="if(hovering, skin_buttonglow(get(name),0.3), skin_buttonglow(null);delete(skin_lockglow); ); if(onup2, onup2() );"
+	       />
+	
+	<!--  热点样式九 STAR -->
+	<style name="zlqj_hotspot_9_1"
+	       url="spot9.png"
+	       crop="0|0|40|40" 
+		   framewidth="40" 
+		   frameheight="40" 
+		   frame="0" 
+		   framespeed="0.03" 
+		   frameoff="0" 
+		   lastframe="49" 
+           onloaded="set(frameoff,0);zlqj_hotspot_9_animate(); " 
+           	/>
+           	
+    <!-- skin_hotspotstyle - style for the hotspots (note - the onclick event will be overwritten here and can't be set directly at the hotspot! the hotspots need to have a 'linkedscene' attribute to be clickable) -->
+	<!--looktohotspot(); -->
+	<style name="skin_hotspotstyle" url="vtourskin_hotspot.png" crop="0|0|128|112"  framewidth="128"        frameheight="112" frame="0" lastframe="5" scale="0.5" oy="50" distorted="false" 
+	onclick="if(linkedscene, tween(scale,0.25,0.5); tween(oy,-20,0.5); tween(alpha,0,0.5); loadscene(get(linkedscene),null,MERGE,BLEND(1)); skin_updatescroll(); );" 
+	onhover="if(skin_settings.tooltips_hotspots, if(linkedscene, showtext(get(scene[get(linkedscene)].title),SKIN_TOOLTIPS)) );" 
+	onloaded="if(distorted,add_tooltip2(get(linkedscene),1),add_all_the_time_tooltip(get(linkedscene),1));"/>       	
+
+
+	
+	
+	
+<!--720云皮肤-->
+<style name="skin_thumbs_style" url="thumbs_k.png"/>
+<settings    
+    bottom_right_btn_width="160"
+    menu_btn_width="70"
+	
+    pano_thumbs_width="80"
+    pano_thumbs_height="80"
+    pano_thumbs_padding_v="10"
+    pano_thumbs_padding_h="20"
+
+    category_thumbs_width="100"
+    category_thumbs_height="100"
+    category_thumbs_padding_v="10"
+    category_thumbs_padding_h="30"
+    category_thumbs_bg_crop="0|0|218|218"
+    category_thumbs_bg_crop_selected="218|0|218|218"
+	
+    plugin_url="../plugins/"
+	
+    thumb_btn_url="piclist.png"
+/>
+<plugin_url
+    TEXT_SWF="calc:settings.plugin_url + 'textfield.swf'"   
+    SCROLL_SWF="calc:settings.plugin_url + 'scrollarea.swf'"
+    SCROLL_JS="calc:settings.plugin_url + 'scrollarea.js'"
+      />
+<!-- 单击隐藏缩略图 -->
+<events  onclick="on_click();"  />
+
+<!-- 全局开始配置 -->
+<action name="startup2" autorun="onstart">
+
+    setup_startup_vars();
+    delayedcall(1,
+
+    callwith(layer[category_thumb_container_0],onclick);
+
+        set(layer[pano_thumb_container_0_0].bgborder,3 0xf6b64c 1);
+
+        set(pano_id,get(xml.scene))
+    );
+
+
+</action>
+
+
+<action name="setup_startup_vars">
+
+
+  <!-- 手机端优化 -->
+  set(customScale, 1);
+  if(device.mobile,
+    if(stagewidth LT stageheight,
+      div(customScale, stagewidth,540);
+      ,
+      div(customScale, stageheight,360);
+    );
+  );
+  mul(stagescale,customScale );
+
+
+  set(events.onpreviewcomplete,on_preview_complete());
+
+
+                                        
+  set(scene_name,get(pano_id));
+                                  
+  for(set(o,0), o LT config.thumbs.category.count, inc(o),
+    for(set(i,0), i LT config.thumbs.category[get(o)].pano.count, inc(i),
+      if(pano_id == config.thumbs.category[get(o)].pano[get(i)].name,
+        copy(current_category_index,o);
+      );
+    );
+  );
+
+</action>
+
+<events name="xx" keep="true" onnewscene="
+
+if(category_loadscene == false,
+toggle_category_thumbs();
+ 
+  for(set(o2,0), o2 LT config.thumbs.category.count, inc(o2),
+    for(set(i2,0), i2 LT config.thumbs.category[get(o2)].pano.count, inc(i2),
+      txtadd(pano_thumb_container_name2,'pano_thumb_container_',get(o2),'_',get(i2));
+     
+      if(config.thumbs.category[get(o2)].pano[get(i2)].name == xml.scene,
+     
+    
+        copy(real_category_index,o2); 
+      
+
+       
+       
+
+
+
+      );
+    );
+  );
+  copy(pano_id,xml.scene);
+  toggle_category_thumbs();
+
+  );
+delayedcall(1,
+set(category_loadscene,false);
+);
+
+
+
+
+
+
+  "/>
+
+
+<action name="on_preview_complete">
+ <!--  setup_pano_config(); -->
+
+  if(first_pano_inited === null,
+
+    setup_thumbs();
+	<!-- 点击缩略图切换保持缩略图显示 -->
+    set(first_pano_inited,true);
+	);
+
+
+
+</action>
+
+<!-- 点击隐藏 -->
+<action name="on_click">
+  if(category_thumbs_show == true,
+    toggle_category_thumbs();
+  );
+</action>      
+
+
+
+<!-- 缩略图点击场景链接属性 -->
+<action name="load_pano_by_id">
+  set(pano_id,%1);
+  set(scene_name,%1);
+
+  if(%2 == 1 ,
+    loadscene(get(scene_name),null,KEEPVIEW|MERGE,BLEND(0.5, easeInCubic));
+    ,
+    loadscene(get(scene_name),null,MERGE,BLEND(0.5, easeInCubic));
+    set(category_loadscene,true);
+    
+  );
+  copy(real_category_index,category_index); 
+  update_pano_change_ui();
+</action>
+
+<!-- 当前场景缩略图 -->
+<action name="update_pano_change_ui">
+  for(set(o,0), o LT config.thumbs.category.count, inc(o),
+    for(set(i,0), i LT config.thumbs.category[get(o)].pano.count, inc(i),
+      txtadd(pano_thumb_container_name,'pano_thumb_container_',get(o),'_',get(i));
+      if(pano_id == config.thumbs.category[get(o)].pano[get(i)].name,
+      
+        set(layer[get(pano_thumb_container_name)].bgborder,3 0xf6b64c 1);
+        trace(pano_thumb_container_name);
+        ,
+        set(layer[get(pano_thumb_container_name)].bgborder,3 0xffffff 1);
+      );
+    );
+  );
+</action>
+
+<!-- 配置缩略图 -->
+<action name="setup_thumbs">
+
+  copy(menu_btn_size,settings.menu_btn_width);
+
+  if(scene.count GT 1 ,
+    set(thumbs_btn_name,'thumbs_btn');
+    set(thumbs_btn_txt_name,'thumbs_btn_txt');
+    set(thumbs_btn_container_name,'thumbs_btn_container');
+
+    addlayer(get(thumbs_btn_container_name));
+    set(layer[get(thumbs_btn_container_name)].parent, 'thumb_container');
+    set(layer[get(thumbs_btn_container_name)].align, bottomleft);
+     set(layer[get(thumbs_btn_container_name)].y, 0);
+    set(layer[get(thumbs_btn_container_name)].keep, true);
+    set(layer[get(thumbs_btn_container_name)].type, container);
+    set(layer[get(thumbs_btn_container_name)].width, 80);
+    set(layer[get(thumbs_btn_container_name)].height, 92);
+    set(layer[get(thumbs_btn_container_name)].scale, 1);
+    set(layer[get(thumbs_btn_container_name)].children,false);
+    set(layer[get(thumbs_btn_container_name)].bgcapture,true);
+    set(layer[get(thumbs_btn_container_name)].bgcolor,0);
+    set(layer[get(thumbs_btn_container_name)].bgalpha,0);
+    set(layer[get(thumbs_btn_container_name)].onclick,
+      toggle_category_thumbs();
+    );
+
+
+    addlayer(get(thumbs_btn_name));
+    set(layer[get(thumbs_btn_name)].parent, get(thumbs_btn_container_name));
+    set(layer[get(thumbs_btn_name)].scale, 0.5);
+    set(layer[get(thumbs_btn_name)].align, bottom);
+    set(layer[get(thumbs_btn_name)].width, 80);
+    set(layer[get(thumbs_btn_name)].height, 80);
+    set(layer[get(thumbs_btn_name)].y, 25);
+    set(layer[get(thumbs_btn_name)].keep, true);
+
+
+    addlayer(get(thumbs_btn_txt_name));
+    copy(layer[get(thumbs_btn_txt_name)].url, plugin_url.TEXT_SWF);
+    set(layer[get(thumbs_btn_txt_name)].parent, get(thumbs_btn_container_name));
+    set(layer[get(thumbs_btn_txt_name)].align, bottomcenter);
+    set(layer[get(thumbs_btn_txt_name)].keep, true);
+    set(layer[get(thumbs_btn_txt_name)].width, get(menu_btn_size));
+    set(layer[get(thumbs_btn_txt_name)].height, 20);
+    set(layer[get(thumbs_btn_txt_name)].y, 0);
+    set(layer[get(thumbs_btn_txt_name)].background,false);
+    set(layer[get(thumbs_btn_txt_name)].textshadow,0.5);
+    set(layer[get(thumbs_btn_txt_name)].wordwrap,false);
+    set(layer[get(thumbs_btn_txt_name)].css,color:#ffffff; font-family:STXihei; text-align:center; font-size:12px;);
+
+
+    if(config.thumbs.category.count == 1,
+     
+      set(layer[get(thumbs_btn_txt_name)].html, get(config.thumbs.category[0].title));
+      ,
+  
+      set(layer[get(thumbs_btn_txt_name)].html, get(config.thumbs.title));
+    );
+
+    add_category_thumbs();
+    add_pano_thumbs();
+
+
+    if(config.thumbs.show_thumb == 1,
+      delayedcall(0.5,toggle_category_thumbs(););
+    );
+
+  );
+</action>
+
+<!-- 添加缩略图分组 -->
+<action name="add_category_thumbs">
+
+
+  if(config.thumbs.category.count GT 1,
+
+
+
+    copy(thumbwidth, settings.category_thumbs_width);
+    copy(thumbheight, settings.category_thumbs_height);
+    copy(thumbpadding_h, settings.category_thumbs_padding_h);
+    copy(thumbpadding_v, settings.category_thumbs_padding_v);
+    copy(thumbcrop, settings.category_thumbs_bg_crop);
+
+    add(thumbxoffset, thumbwidth, thumbpadding_h);
+    mul(thumbxcenter, thumbxoffset, 0.5);
+    mul(thumbbarwidth, thumbxoffset, config.thumbs.category.count);
+    add(thumbbarwidth, thumbpadding_h);
+    add(thumbbarheight, thumbpadding_v, thumbheight);
+    add(thumbbarheight, thumbpadding_v);
+
+    addlayer(category_thumbs_mask);
+    set(layer[category_thumbs_mask].parent, 'category_container');
+    set(layer[category_thumbs_mask].type, container);
+    set(layer[category_thumbs_mask].align, bottomleft);
+    set(layer[category_thumbs_mask].y, 80);
+    set(layer[category_thumbs_mask].width, 100%);
+    set(layer[category_thumbs_mask].height, 100%);
+    set(layer[category_thumbs_mask].maskchildren,true);
+    set(layer[category_thumbs_mask].keep,true);
+
+
+    addlayer(category_thumbs_container);
+    set(layer[category_thumbs_container].parent, 'category_thumbs_mask');
+    set(layer[category_thumbs_container].type, container);
+    set(layer[category_thumbs_container].align, bottomleft);
+    set(layer[category_thumbs_container].y, -150);
+    set(layer[category_thumbs_container].width, 100%);
+    copy(layer[category_thumbs_container].height, thumbbarheight);
+    set(layer[category_thumbs_container].bgcolor,0xF5A623);
+    set(layer[category_thumbs_container].bgalpha, 0.3);  <!--主导航 背景色-->
+    set(layer[category_thumbs_container].keep,true);
+
+    addlayer(category_thumbs_scrollarea);
+    if(device.flash,
+      copy(layer[category_thumbs_scrollarea].url, plugin_url.SCROLL_SWF);
+      ,
+      copy(layer[category_thumbs_scrollarea].url, plugin_url.SCROLL_JS);
+    );
+    set(layer[category_thumbs_scrollarea].parent,'category_thumbs_container');
+    set(layer[category_thumbs_scrollarea].direction,h);
+    set(layer[category_thumbs_scrollarea].align,bottom);
+    copy(layer[category_thumbs_scrollarea].height,thumbbarheight);
+    set(layer[category_thumbs_scrollarea].keep,true);
+    set(layer[category_thumbs_scrollarea].onloaded,setcenter(0,0););
+
+
+
+
+    set(thumb_cnt,0);
+    for(set(i,0), i LT config.thumbs.category.count, inc(i),
+
+      txtadd(category_thumb_container_name,'category_thumb_container_',get(i));
+      txtadd(category_thumb_name,'category_thumb_',get(i));
+      txtadd(category_thumb_text_name, 'category_thumb_text_', get(i));
+
+      addlayer(get(category_thumb_container_name));
+      copy(layer[get(category_thumb_container_name)].url, config.thumbs.category[get(i)].thumb);
+      set(layer[get(category_thumb_container_name)].keep, true);
+      set(layer[get(category_thumb_container_name)].parent, 'category_thumbs_scrollarea');
+      set(layer[get(category_thumb_container_name)].align, left);
+      set(layer[get(category_thumb_container_name)].children, false);
+      set(layer[get(category_thumb_container_name)].category_index2, get(i));
+      set(layer[get(category_thumb_container_name)].onclick, copy(category_index,category_index2);show_pano_thumbs(););
+      set(layer[get(category_thumb_container_name)].title, get(config.thumbs.category[get(i)].title));
+      set(layer[get(category_thumb_container_name)].onhover,showtext(get(title),tooltipTextStyle));
+      layer[get(category_thumb_container_name)].loadstyle(skin_thumbs_style);
+      copy(layer[get(category_thumb_container_name)].crop, thumbcrop);
+      copy(layer[get(category_thumb_container_name)].width, thumbwidth);
+      copy(layer[get(category_thumb_container_name)].height, thumbheight);
+      mul(thumbx, i, thumbxoffset);
+      add(thumbx, thumbpadding_h);
+      copy(layer[get(category_thumb_container_name)].x, thumbx);
+      add(scene[get(i)].thumbx, thumbx, thumbxcenter);
+      copy(scene[get(i)].thumby, thumbpadding_v);
+
+
+
+      addlayer(get(category_thumb_name));
+      copy(layer[get(category_thumb_name)].url, scene[get(config.thumbs.category[get(i)].pano[0].name)].thumburl);
+      set(layer[get(category_thumb_name)].keep, true);
+      set(layer[get(category_thumb_name)].parent, get(category_thumb_container_name));
+      set(layer[get(category_thumb_name)].align, leftbottom);
+      set(layer[get(category_thumb_name)].category_index, get(i));
+      set(layer[get(category_thumb_name)].width, 83);
+      set(layer[get(category_thumb_name)].height, 83);
+      set(layer[get(category_thumb_name)].x, 8);
+      set(layer[get(category_thumb_name)].y, 8);
+
+
+      addlayer(get(category_thumb_text_name));
+      copy(layer[get(category_thumb_text_name)].url, plugin_url.TEXT_SWF);
+      set(layer[get(category_thumb_text_name)].keep, true);
+      set(layer[get(category_thumb_text_name)].align, bottom);
+      set(layer[get(category_thumb_text_name)].width,80);
+      set(layer[get(category_thumb_text_name)].height,16);
+      set(layer[get(category_thumb_text_name)].y,10);
+      set(layer[get(category_thumb_text_name)].background,true);
+      set(layer[get(category_thumb_text_name)].backgroundcolor,0xF5A623);   <!--导航缩略图 主导航-->
+      set(layer[get(category_thumb_text_name)].backgroundalpha,1);
+      set(layer[get(category_thumb_text_name)].wordwrap,false);
+      set(layer[get(category_thumb_text_name)].css,color:#ffffff; font-family:STXihei; text-align:center;  font-size:12px;);  <!--导航缩略图 主导航缩略图大小-->
+      set(layer[get(category_thumb_text_name)].parent, get(category_thumb_container_name));
+      set(layer[get(category_thumb_text_name)].html, get(config.thumbs.category[get(i)].title));
+
+      inc(thumb_cnt);
+
+    );
+
+
+    copy(layer[category_thumbs_scrollarea].width, thumbwidth);
+    add(layer[category_thumbs_scrollarea].width, thumbpadding_h);
+    mul(layer[category_thumbs_scrollarea].width, thumb_cnt);
+    add(layer[category_thumbs_scrollarea].width, thumb_cnt);
+
+  );
+</action>
+
+
+<action name="add_pano_thumbs">
+
+  if(scene.count GT 1 ,
+
+    copy(thumbwidth, settings.pano_thumbs_width);
+    copy(thumbheight, settings.pano_thumbs_height);
+    copy(thumbpadding_h, settings.pano_thumbs_padding_h);
+    copy(thumbpadding_v, settings.pano_thumbs_padding_v);
+
+    add(thumbxoffset, thumbwidth, thumbpadding_h);
+    mul(thumbxcenter, thumbxoffset, 0.5);
+    mul(thumbbarwidth, thumbxoffset, config.thumbs.category.count);
+    add(thumbbarwidth, thumbpadding_h);
+    add(thumbbarheight, thumbpadding_v, thumbheight);
+    add(thumbbarheight, thumbpadding_v);
+
+    for(set(o,0), o LT config.thumbs.category.count, inc(o),
+
+      txtadd(pano_thumbs_mask_name,'pano_thumbs_mask_',get(o));
+      txtadd(pano_thumbs_container_name,'pano_thumbs_container_',get(o));
+      txtadd(pano_thumbs_scrollarea_name,'pano_thumbs_scrollarea_',get(o));
+
+      addlayer(get(pano_thumbs_mask_name));
+      set(layer[get(pano_thumbs_mask_name)].parent, 'category_container');
+      set(layer[get(pano_thumbs_mask_name)].type, container);
+      set(layer[get(pano_thumbs_mask_name)].align, bottomleft);
+      if(config.thumbs.category.count GT 1 ,
+        set(layer[get(pano_thumbs_mask_name)].y, 210);
+        ,
+        set(layer[get(pano_thumbs_mask_name)].y, 80);
+      );
+      set(layer[get(pano_thumbs_mask_name)].width, 100%);
+      set(layer[get(pano_thumbs_mask_name)].height, 100%);
+      set(layer[get(pano_thumbs_mask_name)].maskchildren,true);
+      set(layer[get(pano_thumbs_mask_name)].keep,true);
+
+
+
+      addlayer(get(pano_thumbs_container_name));
+      set(layer[get(pano_thumbs_container_name)].parent, get(pano_thumbs_mask_name));
+      set(layer[get(pano_thumbs_container_name)].type, container);
+      set(layer[get(pano_thumbs_container_name)].align, bottomleft);
+      set(layer[get(pano_thumbs_container_name)].y, 0);
+      set(layer[get(pano_thumbs_container_name)].width, 100%);
+      copy(layer[get(pano_thumbs_container_name)].height, thumbbarheight);
+      set(layer[get(pano_thumbs_container_name)].bgcolor,0xF5A623);
+      set(layer[get(pano_thumbs_container_name)].bgalpha, 0.3);  <!--上导航 背景颜色-->
+      set(layer[get(pano_thumbs_container_name)].keep,true);
+      set(layer[get(pano_thumbs_container_name)].y, -140);
+
+
+      addlayer(get(pano_thumbs_scrollarea_name));
+      if(device.flash,
+        copy(layer[get(pano_thumbs_scrollarea_name)].url, plugin_url.SCROLL_SWF);
+        ,
+        copy(layer[get(pano_thumbs_scrollarea_name)].url, plugin_url.SCROLL_JS);
+      );
+      set(layer[get(pano_thumbs_scrollarea_name)].parent,get(pano_thumbs_container_name));
+      set(layer[get(pano_thumbs_scrollarea_name)].direction,h);
+      set(layer[get(pano_thumbs_scrollarea_name)].align,bottom);
+      set(layer[get(pano_thumbs_scrollarea_name)].height,100);
+      set(layer[get(pano_thumbs_scrollarea_name)].keep,true);
+
+
+      set(thumb_cnt,0);
+      for(set(i,0), i LT config.thumbs.category[get(o)].pano.count, inc(i),
+
+        txtadd(pano_thumb_container_name,'pano_thumb_container_',get(o),'_',get(i));
+        txtadd(pano_thumb_img_name,'pano_thumb_img_',get(o),'_',get(i));
+        txtadd(pano_thumb_text_name, 'pano_thumb_text_',get(o),'_',get(i));
+
+
+
+        addlayer(get(pano_thumb_container_name));
+        set(layer[get(pano_thumb_container_name)].type, container);
+        set(layer[get(pano_thumb_container_name)].keep, true);
+        set(layer[get(pano_thumb_container_name)].parent, get(pano_thumbs_scrollarea_name));
+        set(layer[get(pano_thumb_container_name)].bgcolor,0xF4AC33);
+        set(layer[get(pano_thumb_container_name)].bgalpha,1);
+        set(layer[get(pano_thumb_container_name)].bgborder,3 0xF4AC33 1);
+        set(layer[get(pano_thumb_container_name)].children, false);
+        set(layer[get(pano_thumb_container_name)].bgcapture, true);
+        set(layer[get(pano_thumb_container_name)].align, leftbottom);
+        copy(layer[get(pano_thumb_container_name)].width, thumbwidth);
+        copy(layer[get(pano_thumb_container_name)].height, thumbheight);
+        mul(thumbx, i, thumbxoffset);
+        add(thumbx, thumbpadding_h);
+        copy(layer[get(pano_thumb_container_name)].x, thumbx);
+        copy(layer[get(pano_thumb_container_name)].y, thumbpadding_v);
+        add(scene[get(i)].thumbx, thumbx, thumbxcenter);
+        copy(scene[get(i)].thumby, thumbpadding_v);
+        copy(layer[get(pano_thumb_container_name)].linkedscene, config.thumbs.category[get(o)].pano[get(i)].name);
+        set(layer[get(pano_thumb_container_name)].onclick,
+          load_pano_by_id(get(linkedscene));
+        );
+        set(layer[get(pano_thumb_container_name)].title, get(config.thumbs.category[get(o)].pano[get(i)].title));
+        set(layer[get(pano_thumb_container_name)].onhover,showtext(get(title),tooltipTextStyle));
+
+
+
+        addlayer(get(pano_thumb_img_name));
+        copy(layer[get(pano_thumb_img_name)].url, scene[get(config.thumbs.category[get(o)].pano[get(i)].name)].thumburl);
+        set(layer[get(pano_thumb_img_name)].keep, true);
+        set(layer[get(pano_thumb_img_name)].parent, get(pano_thumb_container_name));
+        set(layer[get(pano_thumb_img_name)].align, center);
+        copy(layer[get(pano_thumb_img_name)].width, thumbwidth);
+        copy(layer[get(pano_thumb_img_name)].height, thumbheight);
+
+
+        addlayer(get(pano_thumb_text_name));
+                                                                                             
+        copy(layer[get(pano_thumb_text_name)].url, plugin_url.TEXT_SWF);
+        set(layer[get(pano_thumb_text_name)].keep, true);
+        set(layer[get(pano_thumb_text_name)].align, bottom);
+        set(layer[get(pano_thumb_text_name)].width,80);
+        set(layer[get(pano_thumb_text_name)].height,16);
+        set(layer[get(pano_thumb_text_name)].background,true);
+        set(layer[get(pano_thumb_text_name)].backgroundcolor,0xF4AC33);<!--上面导航-->
+        set(layer[get(pano_thumb_text_name)].backgroundalpha,1);  <!--上面导航-->
+        set(layer[get(pano_thumb_text_name)].wordwrap,false);
+        set(layer[get(pano_thumb_text_name)].css,color:#ffffff; font-family:STXihei; text-align:center; font-size:12px;);
+        set(layer[get(pano_thumb_text_name)].parent, get(pano_thumb_container_name));
+        set(layer[get(pano_thumb_text_name)].html, get(config.thumbs.category[get(o)].pano[get(i)].title));
+
+        inc(thumb_cnt);
+
+      );
+
+
+      copy(layer[get(pano_thumbs_scrollarea_name)].width, thumbwidth);
+      add(layer[get(pano_thumbs_scrollarea_name)].width, thumbpadding_h);
+      mul(layer[get(pano_thumbs_scrollarea_name)].width, thumb_cnt);
+      add(layer[get(pano_thumbs_scrollarea_name)].width, thumb_cnt);
+    );
+  );
+</action>
+
+<action name="toggle_category_thumbs">
+  if(config.thumbs.category.count GT 1 ,
+    if(category_thumbs_show == true,
+      hide_category_thumbs();
+      hide_pano_thumbs();
+      ,
+      show_category_thumbs();
+      show_pano_thumbs(1);
+    );
+    ,
+    if(category_thumbs_show == true,
+      hide_pano_thumbs();
+      set(category_thumbs_show,false);
+      ,
+      show_pano_thumbs();
+      set(category_thumbs_show,true);
+    );
+  );
+</action>
+
+<action name="show_category_thumbs">
+  tween(layer[category_thumbs_container].y,0,0.2);
+  set(category_thumbs_show,true);
+</action>
+
+<action name="hide_category_thumbs">
+  if(category_thumbs_show == true,
+    tween(layer[category_thumbs_container].y,-150,0.2);
+    set(category_thumbs_show,false);
+  );
+</action>
+
+<action name="show_pano_thumbs">
+  if(pano_thumbs_show == true AND current_category_index != category_index,
+    hide_pano_thumbs();
+     
+  );
+  if(category_index === null,
+    copy(category_index,current_category_index);
+  );
+
+  if(%1 == 1,copy(category_index,real_category_index));
+  txtadd(current_category_thumb_name,'category_thumb_container_',get(category_index));
+  copy(layer[get(current_category_thumb_name)].crop, settings.category_thumbs_bg_crop_selected);
+
+  txtadd(current_category_name,'pano_thumbs_container_',get(category_index));
+  tween(layer[get(current_category_name)].y,0,0.2);
+
+
+  copy(current_category_index,category_index);
+  set(pano_thumbs_show,true);
+
+  update_pano_change_ui();
+</action>
+
+<action name="hide_pano_thumbs">
+
+  if(pano_thumbs_show == true,
+    txtadd(current_category_thumb_name,'category_thumb_container_',get(current_category_index));
+    copy(layer[get(current_category_thumb_name)].crop, settings.category_thumbs_bg_crop);
+
+    txtadd(current_category_name,'pano_thumbs_container_',get(current_category_index));
+    tween(layer[get(current_category_name)].y,-140,0.2);
+    set(pano_thumbs_show,false);
+  );
+</action>
+
+<action name="add_thumbs">
+
+  addlayer(category_thumbs_scrollarea);
+  if(device.flash,
+    copy(layer[category_thumbs_scrollarea].url, plugin_url.SCROLL_SWF);
+    ,
+    copy(layer[category_thumbs_scrollarea].url, plugin_url.SCROLL_JS);
+  );
+  set(layer[category_thumbs_scrollarea].parent,'category_container');
+  set(layer[category_thumbs_scrollarea].direction,h);
+  set(layer[category_thumbs_scrollarea].align,bottomleft);
+  set(layer[category_container].y,200);
+  set(layer[category_thumbs_scrollarea].height,140);
+  set(layer[category_thumbs_scrollarea].keep,true);
+  set(layer[category_thumbs_scrollarea].backgroundalpha,1);
+  set(layer[get(category_container)].background,true);
+  set(layer[get(category_container)].backgroundcolor,0xF5A623);
+  set(layer[get(category_container)].backgroundalpha,0.1);
+  set(layer[category_thumbs_scrollarea].onloaded,
+    trace(category_scroll loaded);
+  );
+  set(layer[category_thumbs_scrollarea].onscroll,
+    trace(scrolling);
+  );
+
+  copy(thumbwidth, settings.thumbs_width);
+  copy(thumbheight, settings.thumbs_height);
+  copy(thumbpadding, settings.thumbs_padding);
+                                                 
+
+  add(thumbxoffset, thumbwidth, thumbpadding);
+  mul(thumbxcenter, thumbxoffset, 0.5);
+  mul(thumbbarwidth, thumbxoffset, config.thumbs.category.count);
+  add(thumbbarwidth, thumbpadding);
+  add(thumbbarheight, thumbpadding, thumbheight);
+  add(thumbbarheight, thumbpadding);                                                                                                                                           
+
+  if(config.thumbs.category.count GT 0,
+
+    set(thumb_cnt,0);
+    for(set(i,0), i LT config.thumbs.category.count, inc(i),
+
+      txtadd(category_thumb_name,'category_thumb_',get(i));
+      txtadd(category_thumb_text_name, 'category_thumb_text_', get(i));
+
+      addlayer(get(category_thumb_name));
+      copy(layer[get(category_thumb_name)].url, config.thumbs.category[get(i)].thumb);
+      set(layer[get(category_thumb_name)].keep, true);
+      set(layer[get(category_thumb_name)].parent, 'category_thumbs_scrollarea');
+      set(layer[get(category_thumb_name)].align, lefttop);
+                                                                     
+      copy(layer[get(category_thumb_name)].width, thumbwidth);
+      copy(layer[get(category_thumb_name)].height, thumbheight);
+      mul(thumbx, i, thumbxoffset);
+      add(thumbx, thumbpadding);
+      copy(layer[get(category_thumb_name)].x, thumbx);
+      copy(layer[get(category_thumb_name)].y, thumbpadding);
+      add(scene[get(i)].thumbx, thumbx, thumbxcenter);
+      copy(scene[get(i)].thumby, thumbpadding);                      
+
+      addlayer(get(category_thumb_text_name));                                                                                                   
+      copy(layer[get(category_thumb_text_name)].url, plugin_url.TEXT_SWF);
+      set(layer[get(category_thumb_text_name)].keep, true);
+      set(layer[get(category_thumb_text_name)].align, bottom);
+      set(layer[get(category_thumb_text_name)].width,80);
+      set(layer[get(category_thumb_text_name)].height,16);
+      set(layer[get(category_thumb_text_name)].background,true);
+      set(layer[get(category_thumb_text_name)].backgroundcolor,0xF5A623);
+      set(layer[get(category_thumb_text_name)].backgroundalpha,1);
+      set(layer[get(category_thumb_text_name)].wordwrap,false);
+      set(layer[get(category_thumb_text_name)].css,color:#ffffff; font-family:STXihei; text-align:center; font-size:12px;);
+      set(layer[get(category_thumb_text_name)].parent, get(category_thumb_name));
+      set(layer[get(category_thumb_text_name)].html, get(config.thumbs.category[get(i)].title));
+
+      inc(thumb_cnt);
+      );
+
+      copy(layer[category_thumbs_scrollarea].width, thumbwidth);
+      add(layer[category_thumbs_scrollarea].width, thumbpadding);
+      mul(layer[category_thumbs_scrollarea].width, thumb_cnt);
+      add(layer[category_thumbs_scrollarea].width, thumb_cnt);
+
+  );                             
+</action>
+
+
+
+
+
+<style name="skin_base2" url="b2.png" />
+<style name="skin_base3" url="glass.png" />
+<!--缩略图 PC端-->
+
+	<layer name="skin_btn_funtion" url="b0.png" devices="fullscreensupport" align="leftbottom"  x="30"   y="35" scale="0.42" onclick="toggle_category_thumbs();" keep="true" alpha="0.8" onhover="showtext(场景选择,STYLE4)" scalechildren="false" visible="true">
+	
+			<layer name="texts_title1" url="%SWFPATH%/plugins/textfield.swf" edge="center" align="bottom" x="2" y="-15"  html="场景选择" keep="true"   css="font-family:Arial; font-size:11px; color:#FFFFFF;font-weight:0;"
+       autowidth="auto" css.mobile="font-family:Arial; font-size:18px; color:#FFFFFF;font-weight:0;"
+	   
+       autoheight="auto"
+       vcenter="false"
+       padding="0"
+       wordwrap="true"
+       selectable="false"
+       embeddedfonts="false"
+       background="false"
+       backgroundcolor="0x00FF80"
+       backgroundalpha="1"
+       border="false"
+       bordercolor="0x000000"
+       borderalpha="1.0"
+       borderwidth="1.0"
+       roundedge="10"
+       shadow="0.0"
+       shadowrange="4.0"
+       shadowangle="45"
+       shadowcolor="0x000000"
+       shadowalpha="1.0"
+       textshadow="0.5"
+       textshadowrange="4.0"
+       textshadowangle="45"
+       textshadowcolor="0x000000"
+       textshadowalpha="1.0"
+       onautosized="" />	
+	
+	
+	</layer>
+	
+	
+	
+	<!--缩略图  移动端-->
+
+	<layer name="skin_btn_funtion"  url="b0.png" style="skin_base2" devices="mobile|ipad|iOS5.1" align="leftbottom"   x="10"   y="30"  altscale="0.5" onclick="toggle_category_thumbs();" keep="true" alpha="0.8" onhover="showtext(场景选择,STYLE4)" scalechildren="false" visible="true">
+	
+			<layer name="texts_title1" url="%SWFPATH%/plugins/textfield.swf" edge="center" align="bottom" x="2" y="-15"  html="场景选择" keep="true"   css="font-family:Arial; font-size:11px; color:#FFFFFF;font-weight:0;"
+       autowidth="auto" css.mobile="font-family:Arial; font-size:17px; color:#FFFFFF;font-weight:0;"
+	   
+       autoheight="auto"
+       vcenter="false"
+       padding="0"
+       wordwrap="true"
+       selectable="false"
+       embeddedfonts="false"
+       background="false"
+       backgroundcolor="0x00FF80"
+       backgroundalpha="1"
+       border="false"
+       bordercolor="0x000000"
+       borderalpha="1.0"
+       borderwidth="1.0"
+       roundedge="10"
+       shadow="0.0"
+       shadowrange="4.0"
+       shadowangle="45"
+       shadowcolor="0x000000"
+       shadowalpha="1.0"
+       textshadow="0.5"
+       textshadowrange="4.0"
+       textshadowangle="45"
+       textshadowcolor="0x000000"
+       textshadowalpha="1.0"
+       onautosized="" />	
+	
+	
+	</layer>
+	
+	
+ 
+		       
+
+	<!--电话按钮 PC端-->
+
+	<layer name="skin_btn_thumbs2" url="b1.png" align="leftbottom" devices="fullscreensupport"  x="100"   y="35" visible="true" scale="0.42"  onclick="openurl('tel: 4008853323',_blank);" keep="true" alpha="0.8" onhover="showtext(客服电话,STYLE4)">
+	
+	
+				<layer name="texts_title2" url="%SWFPATH%/plugins/textfield.swf" edge="center" align="bottom" x="2" y="-15"  html="客服电话" keep="true"   css="font-family:Arial; font-size:11px; color:#FFFFFF;font-weight:0;"
+       autowidth="auto" css.mobile="font-family:Arial; font-size:18px; color:#FFFFFF;font-weight:0;"
+	   
+       autoheight="auto"
+       vcenter="false"
+       padding="0"
+       wordwrap="true"
+       selectable="false"
+       embeddedfonts="false"
+       background="false"
+       backgroundcolor="0x00FF80"
+       backgroundalpha="1"
+       border="false"
+       bordercolor="0x000000"
+       borderalpha="1.0"
+       borderwidth="1.0"
+       roundedge="10"
+       shadow="0.0"
+       shadowrange="4.0"
+       shadowangle="45"
+       shadowcolor="0x000000"
+       shadowalpha="1.0"
+       textshadow="0.5"
+       textshadowrange="4.0"
+       textshadowangle="45"
+       textshadowcolor="0x000000"
+       textshadowalpha="1.0"
+       onautosized="" />	
+	
+	</layer>
+	
+	<!--电话按钮 移动端-->
+
+	<layer name="skin_btn_thumbs2" url="b1.png" align="leftbottom" devices="mobile|ipad|iOS5.1"  x="85"   y="30" visible="true" scale="0.42" altscale="0.5"  onclick="openurl('tel: 4008853323',_blank);" keep="true" alpha="0.8" onhover="showtext(客服电话,STYLE4)">
+	
+	
+				<layer name="texts_title2" url="%SWFPATH%/plugins/textfield.swf" edge="center" align="bottom" x="2" y="-15"  html="客服电话" keep="true"   css="font-family:Arial; font-size:11px; color:#FFFFFF;font-weight:0;"
+       autowidth="auto" css.mobile="font-family:Arial; font-size:17px; color:#FFFFFF;font-weight:0;"
+	   
+       autoheight="auto"
+       vcenter="false"
+       padding="0"
+       wordwrap="true"
+       selectable="false"
+       embeddedfonts="false"
+       background="false"
+       backgroundcolor="0x00FF80"
+       backgroundalpha="0.6"
+       border="false"
+       bordercolor="0x000000"
+       borderalpha="1.0"
+       borderwidth="1.0"
+       roundedge="10"
+       shadow="0.0"
+       shadowrange="4.0"
+       shadowangle="45"
+       shadowcolor="0x000000"
+       shadowalpha="1.0"
+       textshadow="0.5"
+       textshadowrange="4.0"
+       textshadowangle="45"
+       textshadowcolor="0x000000"
+       textshadowalpha="1.0"
+       onautosized="" />	
+	
+	</layer>
+	
+	<!--访问官网 PC端-->
+	
+	<layer name="skin_btn_tel" url="b3.png" devices="fullscreensupport" align="leftbottom"  x="170"   y="35" visible="true"  scale="0.42" onclick="openurl('http://www.hemei-car.com/',_blank);" onclick.mobile="openurl('http://www.hemei-car.com/',_blank);" keep="true"  alpha="0.8" onhover="showtext(访问官网,STYLE4)">
+	
+	
+	   <layer name="texts_title3" url="%SWFPATH%/plugins/textfield.swf" edge="center" align="bottom" x="2" y="-15"  html="访问官网" keep="true"   css="font-family:Arial; font-size:11px; color:#FFFFFF;font-weight:0;"
+       autowidth="auto" css.mobile="font-family:Arial; font-size:18px; color:#FFFFFF;font-weight:0;"
+	   
+       autoheight="auto"
+       vcenter="false"
+       padding="0"
+       wordwrap="true"
+       selectable="false"
+       embeddedfonts="false"
+       background="false"
+       backgroundcolor="0x00FF80"
+       backgroundalpha="0.6"
+       border="false"
+       bordercolor="0x000000"
+       borderalpha="1.0"
+       borderwidth="1.0"
+       roundedge="10"
+       shadow="0.0"
+       shadowrange="4.0"
+       shadowangle="45"
+       shadowcolor="0x000000"
+       shadowalpha="1.0"
+       textshadow="0.5"
+       textshadowrange="4.0"
+       textshadowangle="45"
+       textshadowcolor="0x000000"
+       textshadowalpha="1.0"
+       onautosized="" />	
+	
+	</layer>
+	
+	<!--访问官网 移动端-->
+	
+	<layer name="skin_btn_tel"  url="b3.png" devices="mobile|ipad|iOS5.1" align="leftbottom"  x="170"   y="30" visible="true"  scale="0.42" altscale="0.5" onclick="openurl('http://www.hemei-car.com/',_blank);" onclick.mobile="openurl('http://www.hemei-car.com/',_blank);" keep="true"  alpha="0.8" onhover="showtext(访问官网,STYLE4)">
+	
+	
+	   <layer name="texts_title3" url="%SWFPATH%/plugins/textfield.swf" edge="center" align="bottom" x="2" y="-15"  html="访问官网" keep="true"   css="font-family:Arial; font-size:11px; color:#FFFFFF;font-weight:0;"
+       autowidth="auto" css.mobile="font-family:Arial; font-size:18px; color:#FFFFFF;font-weight:0;"
+	   
+       autoheight="auto"
+       vcenter="false"
+       padding="0"
+       wordwrap="true"
+       selectable="false"
+       embeddedfonts="false"
+       background="false"
+       backgroundcolor="0x00FF80"
+       backgroundalpha="0.6"
+       border="false"
+       bordercolor="0x000000"
+       borderalpha="1.0"
+       borderwidth="1.0"
+       roundedge="10"
+       shadow="0.0"
+       shadowrange="4.0"
+       shadowangle="45"
+       shadowcolor="0x000000"
+       shadowalpha="1.0"
+       textshadow="0.5"
+       textshadowrange="4.0"
+       textshadowangle="45"
+       textshadowcolor="0x000000"
+       textshadowalpha="1.0"
+       onautosized="" />	
+	
+	</layer>
+	
+	
+	<!--导航按钮	-->
+	
+	<!--<layer name="skin_btn_gps" url="b4.png" align="leftbottom"  x="190"   y="35"   scale="0.42" onclick="openurl('http://l.map.qq.com/12253219411?m',_blank);" keep="true" devices="mobile" alpha="0.8"/>-->
+	
+	<layer name="skin_btn_gps" url="b4.png" devices="fullscreensupport" align="leftbottom"  x="240"   y="35"   scale="0.42" onclick="js('showmap();');" keep="true"  alpha="0.8" onhover="showtext(导航,STYLE4)" visible="true">
+	
+	
+	
+	
+				<layer name="texts_title4" url="%SWFPATH%/plugins/textfield.swf" edge="center" align="bottom" x="0" y="-15"  html="导航" keep="true"   css="font-family:Arial; font-size:11px; color:#FFFFFF;font-weight:0;" 
+       autowidth="auto" css.mobile="font-family:Arial; font-size:18px; color:#FFFFFF;font-weight:0;"
+	   
+       autoheight="auto"
+       vcenter="false"
+       padding="0"
+       wordwrap="true"
+       selectable="false"
+       embeddedfonts="false"
+       background="false"
+       backgroundcolor="0x00FF80"
+       backgroundalpha="0.6"
+       border="false"
+       bordercolor="0x000000"
+       borderalpha="1.0"
+       borderwidth="1.0"
+       roundedge="10"
+       shadow="0.0"
+       shadowrange="4.0"
+       shadowangle="45"
+       shadowcolor="0x000000"
+       shadowalpha="1.0"
+       textshadow="0.5"
+       textshadowrange="4.0"
+       textshadowangle="45"
+       textshadowcolor="0x000000"
+       textshadowalpha="1.0"
+       onautosized="" />	
+	
+	</layer>
+	
+	<!--导航按钮    移动端-->
+	
+	<!--<layer name="skin_btn_gps" url="b4.png" align="leftbottom"  x="190"   y="35"   scale="0.42" onclick="openurl('http://l.map.qq.com/12253219411?m',_blank);" keep="true" devices="mobile" alpha="0.8"/>-->
+	
+	<layer name="skin_btn_gps" url="b4.png" devices="mobile|ipad|iOS5.1" align="leftbottom"  x="250"   y="30"   scale="0.42" altscale="0.5" onclick="js('showmap();');" keep="true"  alpha="0.8" onhover="showtext(导航,STYLE4)" visible="true">
+	
+				<layer name="texts_title4" url="%SWFPATH%/plugins/textfield.swf" edge="center" align="bottom" x="0" y="-15"  html="导航" keep="true"   css="font-family:Arial; font-size:11px; color:#FFFFFF;font-weight:0;" 
+       autowidth="auto" css.mobile="font-family:Arial; font-size:18px; color:#FFFFFF;font-weight:0;"
+	   
+       autoheight="auto"
+       vcenter="false"
+       padding="0"
+       wordwrap="true"
+       selectable="false"
+       embeddedfonts="false"
+       background="false"
+       backgroundcolor="0x00FF80"
+       backgroundalpha="0.6"
+       border="false"
+       bordercolor="0x000000"
+       borderalpha="1.0"
+       borderwidth="1.0"
+       roundedge="10"
+       shadow="0.0"
+       shadowrange="4.0"
+       shadowangle="45"
+       shadowcolor="0x000000"
+       shadowalpha="1.0"
+       textshadow="0.5"
+       textshadowrange="4.0"
+       textshadowangle="45"
+       textshadowcolor="0x000000"
+       textshadowalpha="1.0"
+       onautosized="" />	
+	
+	
+	
+	</layer>
+	
+	
+	
+	
+	
+	<!--全屏按钮-->
+	
+	<layer name="skin_btn_full" url="full.png" align="righttop"  x="10"   y="20" visible="true"  scale="1" onclick="switch(fullscreen);set(visible,false);set(layer[skin_btn_full_close].visible,true)" keep="true" devices="desktop" alpha="0.6" onhover="showtext(全屏,STYLE4)" />
+	
+	<layer name="skin_btn_full_close" url="close.png" align="righttop"  x="10"   y="20"   visible="false" scale="1" onclick="switch(fullscreen);set(visible,false);set(layer[skin_btn_full].visible,true)" keep="true" devices="desktop" alpha="0.8" onhover="showtext(退出全屏,STYLE4)"/>
+	
+	<!--地图按钮-->
+	
+	<!--<layer name="skin_btn_map" url="map.png" align="righttop"  x="10"   y="80"  zorder="999" scale="0.6" onclick="openmap();set(visible,false);set(layer[skin_btn_map_close].visible,true)" keep="true"  alpha="0.8" onhover="showtext(显示地图)"/>
+	
+	<layer name="skin_btn_map_close" url="map_c.png" align="righttop"  x="10"   y="80" zorder="999" visible="false"  scale="0.6" onclick="closemap();set(visible,false);set(layer[skin_btn_map].visible,true)" keep="true"  alpha="0.8" onhover="showtext(关闭地图)"/>-->-->
+
+	<!--重力按钮-->
+
+<layer name="skin_btn_gyp" url="gyp.png" align="righttop"  x="10"   y="20"  visible="true" scale="1" onclick="set(layer[skin_btn_gyp_close].visible,true);switch(plugin[gyroscope].enabled);set(visible,false);" keep="true" devices="mobile" alpha="0.8" scale.mobile="1.0" onhover="showtext(关闭重力)" />
+	
+	<layer name="skin_btn_gyp_close" url="gyp_c.png" align="righttop"  x="10"   y="20"   visible="true" scale="1" onclick="switch(plugin[gyroscope].enabled);set(visible,false);set(layer[skin_btn_gyp].visible,true)" keep="true" devices="mobile" alpha="0.8" scale.mobile="1.0" onhover="showtext(打开重力)"/>
+
+
+	<!--声音按钮-->
+
+
+	
+	<layer name="skin_btn_sound_c" url="soundoff.png" align="righttop"  x="10"   y="80" zorder="999" visible="false"  scale="0.6" onclick="resumesound(bgmusic);set(visible,false);set(layer[skin_btn_sound].visible,true)" keep="true"  alpha="0.7" onhover="showtext(打开声音,STYLE4)"/>
+	
+		<layer name="skin_btn_sound" url="sound.png" align="righttop"  x="10"   y="80"  zorder="999" scale="0.6" visible="true" onclick="pausesound(bgmusic);set(visible,false);set(layer[skin_btn_sound_c].visible,true)" keep="true"  alpha="0.7" onhover="showtext(关闭声音,STYLE4)"/>
+	
+	
+		<!--眼镜按钮-->
+
+	<!--<layer name="skin_btn_vr" url="glass.png" align="righttop"  x="10"   y="140"  zorder="999" scale="0.6" visible="true" onclick="webvr.enterVR();" keep="true"  alpha="0.8" onhover="showtext(启动VR模式,STYLE4)" y.mobile="220" scale.mobile="1"/>-->
+	
+	<!--<layer name="skin_btn_vr2"    onhover="showtext(VR,STYLE4);"    style="skin_base3"   align="left"  zorder="999"     x="5" y="0"  scale="1" onclick="webvr.enterVR();" visible="true" />-->
+
+
+<!--插入电脑屏幕弹出按钮-->
+
+
+<!--<layer name="skin_btn_bt1" url="bt1.png" align="leftbottom"  x="42"   y="-200" scale="0.8"  keep="true" alpha="0.8" devices="flash" onclick="openurl('http://qq.com',_self);" onhover="showtext(按钮一)"/>
+
+<layer name="skin_btn_bt2" url="bt2.png" align="leftbottom"  x="42"   y="-200" scale="0.8"  keep="true" alpha="0.8" devices="flash" onclick="openurl('http://163.com',_self);" onhover="showtext(按钮二)"/>
+
+<layer name="skin_btn_bt3" url="bt3.png" align="leftbottom"  x="42"   y="-200" scale="0.8"  keep="true" alpha="0.8" devices="flash" onclick="openurl('http://dwz.cn/48cmQ9',_self);" onhover="showtext(按钮三)"/>-->
+
+
+
+
+<plugin name="gyroscope"
+        url="%SWFPATH%/plugins/gyro2.js"
+        keep="true"
+        devices="tablet|mobile"
+        onavailable="delayedcall(0.5, checkGyroAvailability(););"
+        
+        enabled="false"
+       
+        
+        />
+
+
+
+
+
+<krpano devices="mobile">
+
+<!--<layer name="skin_btn_map" url="map.png" align="righttop"  x="10"   y="120"   scale="1" />-->
+	
+	<!--<layer name="skin_btn_map_close" url="map_c.png" align="righttop"  x="10"   y="120"   scale="1" />-->
+
+	<!--<layer name="skin_btn_funtion"  align="leftbottom"  x="20"   y="40" scale="0.8"  keep="true" alpha="0.8"/>-->
+
+	<layer name="skin_btn_thumbs"  align="leftbottom"  x="130"   y="40" scale="0.8"  keep="true" alpha="0.8"/>
+	
+	<!--<layer name="skin_btn_tel"  align="leftbottom"  x="240"   y="40"   scale="0.8" />-->
+	
+	<!--<layer name="skin_btn_gps"  align="leftbottom"  x="350"   y="40"   scale="0.8" />-->
+	
+
+
+<layer name="skin_btn_sound" url="sound.png" align="righttop"  x="10"   y="120"  zorder="999" scale="1" />
+	
+	<layer name="skin_btn_sound_c" url="soundoff.png" align="righttop"  x="10"   y="120" zorder="999"   scale="1" />
+
+
+
+
+<!--插入手机弹出按钮-->
+
+
+<layer name="skin_btn_bt1" url="bt1.png" align="leftbottom"  x="42"   y="-200" scale="1"  keep="true" alpha="0.8" onclick="openurl('http://qq.com',_self);"/>
+
+<layer name="skin_btn_bt2" url="bt2.png" align="leftbottom"  x="42"   y="-200" scale="1"  keep="true" alpha="0.8" onclick="openurl('tel:12345',_self);"/>
+
+<layer name="skin_btn_bt3" url="bt3.png" align="leftbottom"  x="42"   y="-200" scale="1"  keep="true" alpha="0.8" onclick="openurl('http://dwz.cn/48coaf',_self);"/>
+
+
+
+</krpano>
+
+
+
+<!--弹出按钮和隐藏按钮动作-->
+
+<action name="show">
+
+
+tween(layer[skin_btn_bt1].y,150);
+
+tween(layer[skin_btn_bt2].y,250);
+
+tween(layer[skin_btn_bt3].y,350);
+
+
+set(layer[skin_btn_funtion].onclick,hide());
+
+</action>
+
+
+<action name="hide">
+
+
+tween(layer[skin_btn_bt1].y,-200);
+
+tween(layer[skin_btn_bt2].y,-200);
+
+tween(layer[skin_btn_bt3].y,-200);
+
+
+set(layer[skin_btn_funtion].onclick,show());
+
+</action>
+
+
+
+
+
+
+
+
+</krpano>

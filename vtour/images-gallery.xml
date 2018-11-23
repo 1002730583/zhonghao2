@@ -1,0 +1,344 @@
+<krpano> 
+
+    <plugin name="draggableplugin" preload="true"
+        url="plugins/draggableplugin.swf" 
+        alturl="plugins/draggableplugin.js"
+    />
+    
+    <layer name="galleryoverlay" type="container" keep="true" 
+        align="lefttop" x="0" y="0" 
+        width="100%" height="100%" 
+        autoalpha="true"
+        zorder="99" 
+        bgcolor="0x000000" bgalpha="0.65" bgcapture="true" 
+        onclick="closegallery()" 
+        alpha="0"
+        visible="false"
+    />
+
+    <layer name="gallerystage" url="%CURRENTXML%/plugins/textfield.swf" keep="true" visible="false"
+        align="center" x="0" y="-8%" 
+        width="400" height="300" 
+        zorder="100" 
+        selectable="false" 
+        borderwidth="0" roundedge="8" 
+        shadow="0.01" shadowrange="9" shadowcolor="0x000000" shadowalpha="1" 
+        autoalpha="true"
+        alpha="0"
+        preload="true"
+    >
+        <layer name="imageloading" url="%CURRENTXML%/plugins/textfield.swf" keep="true" 
+            align="center" x="0" y="0" 
+            width="130" height="44"
+            vcenter="true"
+            selectable="false" 
+            background="true"
+            backgroundcolor="0x91c7ff"
+            borderwidth="0" roundedge="44" 
+            
+            autoalpha="true"
+            alpha="1"
+            html="[p]Loading...[/p]"
+            css="p {font-family:arial; font-size:18px; text-align:center; color:#FFFFFF; }"
+        />
+        
+        <layer name="gallerybtnsstage" type="container" width="100%" height="100%" alpha="0">
+        
+            <layer name="gallerynext" url="xiangc/gallerybtns.png" keep="true" 
+                align="right" x="-80" y="0" zorder="100"
+                crop="100|0|100|100"
+                onovercrop="100|100|100|100"
+                ondowncrop="100|100|100|100"
+                ondown="set(y,1)"
+                onup="set(y,0)"
+                onclick="prevnextimage(1);"
+            />
+            
+            <layer name="galleryprev" url="xiangc/gallerybtns.png" keep="true" 
+                align="left" x="-80" y="0" zorder="100"
+                crop="0|0|100|100"
+                onovercrop="0|100|100|100"
+                ondowncrop="0|100|100|100"
+                ondown="set(y,1)"
+                onup="set(y,0)"
+                onclick="prevnextimage(-1);"
+            />
+            
+            <layer name="galleryclose" url="xiangc/gallerybtns.png" keep="true" 
+                align="righttop" x="-65" y="-65" zorder="100"
+                crop="200|0|100|100"
+                onovercrop="200|100|100|100"
+                ondowncrop="200|100|100|100"
+                ondown="set(y,-64)"
+                onup="set(y,-65)"
+                onclick="closegallery();"
+            />
+            
+        </layer>
+        
+        <layer name="galleryimage" url="" keep="true" 
+            align="center" x="0" y="0" ox="0" oy="0" 
+            width="788" height="588" zorder="0"
+        >
+            <layer name="imagedescriptionbg" type="container" keep="true" 
+                align="lefttop" x="0" y="20" ox="0" oy="0" 
+                width="300" height="38" zorder="0"
+                maskchildren="true"
+                onclick="showdescription()"
+            >
+                <layer name="description_bg_top" url="xiangc/description_bg.png" keep="true" 
+                    align="righttop" edge="righttop" x="1" y="0" visible="true"
+                    width="100%" crop="0|0|588|1" zorder="1" enabled="false"
+                />                
+                <layer name="description_bg" url="xiangc/description_bg.png" keep="true" 
+                    align="righttop" edge="righttop" x="0" y="0" visible="true"
+                    height="100%" crop="0|5|588|60" zorder="0" enabled="true" capture="false"
+                />                
+                <layer name="description_bg_bot" url="xiangc/description_bg.png" keep="true" 
+                    align="rightbottom" edge="rightbottom" x="1" y="0" visible="true"
+                    width="100%" crop="0|79|588|1" zorder="2" enabled="false"
+                />                
+                <layer name="caption_corner" url="xiangc/caption_corner.png" keep="true" zorder="3"
+                    align="rightbottom" edge="rightbottom" x="3" y="3" visible="true" enabled="false"
+                />
+                <plugin name="image_caption" url="%CURRENTXML%/plugins/textfield.swf" keep="true"
+                    align="lefttop" edge="lefttop"  x="8" y="0" zorder="4"
+                    width="100%" height="38" enabled="false"
+
+                    html="[p]Caption[/p]"
+                    css="p{color:#FFFFFF; font-family:arial; font-size:18px; text-align:left;}"
+                    
+                    selectable="false"
+                    vcenter="true"
+                    background="false"
+                />
+                <plugin name="image_caption" enabled="true" capture="true" onclick="showdescription()" devices="touchdevice" />
+                <layer name="image_description_stage" type="container"
+                    align="lefttop" edge="lefttop"  x="8" y="38" zorder="5"
+                    width="284" height="254" capture="false"
+                    bgcolor="0x000000" bgalpha="0" maskchildren="true"
+                >
+                    <plugin name="image_description" url="%CURRENTXML%/plugins/textfield.swf" keep="true"
+                        align="lefttop" edge="lefttop"  x="0" y="0"
+                        width="100%" autoheight="true" capture="false"
+
+                        html="data:t1_descr"
+                        css="p{color:#FFFFFF; font-family:arial; font-size:14px; text-align:left;}"
+                        
+                        selectable="false"
+                        background="false"
+
+                        ondown="draggableplugin.startdragging(get(name));"
+                        dragaxis="y"
+                        dragfixedalign="true"
+                        onautosized=""
+
+                    />
+                </layer>
+            </layer>
+        </layer>
+
+        <layer name="gallerythumbsbg" type="container" keep="true" 
+            align="bottom" edge="top" x="0" y="-10" 
+            width="550" height="90" 
+            bgcolor="0x000000" bgalpha="0" bgcapture="true" 
+            preload="true"
+            alpha="0"
+        >
+        
+            <layer name="thumbssideleft" url="xiangc/thumbnailssides.png" keep="true"
+                align="left" x="-36" y="0"
+                crop="0|0|70|130"
+                onovercrop="0|130|70|130"
+                ondowncrop="0|130|70|130"
+                ondown="thumbnails.moveto(get(plugin[gallerythumbsbg].curthumbs),begin);"
+                onup="thumbnails.stopmove(get(plugin[gallerythumbsbg].curthumbs));"
+            />
+
+            <layer name="thumbssideright" url="xiangc/thumbnailssides.png" keep="true"
+                align="right" x="-36" y="0"
+                crop="70|0|70|130"
+                onovercrop="70|130|70|130"
+                ondowncrop="70|130|70|130"
+                ondown="thumbnails.moveto(get(plugin[gallerythumbsbg].curthumbs),end);"
+                onup="thumbnails.stopmove(get(plugin[gallerythumbsbg].curthumbs));"
+            />        
+
+        </layer>
+        
+    </layer>
+
+    <action name="setdescription">
+        if(layer[galleryimage].caption,
+            set(layer[imagedescriptionbg].visible,true);
+            copy(layer[imagedescriptionbg].width,layer[galleryimage].caption_width);
+            sub(layer[image_description_stage].width,layer[galleryimage].caption_width,16);
+            txtadd(layer[image_caption].html,[p],get(layer[galleryimage].caption),[/p]);
+            set(layer[caption_corner].visible,false);
+            set(layer[image_description].onautosized,);
+            set(layer[image_description].y,0);
+            set(layer[imagedescriptionbg].onclick,);
+            if(plugin[galleryimage].descr_html,
+                set(layer[caption_corner].visible,true);
+                set(layer[image_description].onautosized,updatedescription());
+                set(layer[imagedescriptionbg].onclick,showdescription());
+                txtadd(layer[image_description].css,data:,get(layer[galleryimage].descr_css));
+                txtadd(layer[image_description].html,data:,get(layer[galleryimage].descr_html));
+            ,
+                set(layer[imagedescriptionbg].height,38);
+            );
+        );
+        updatedescription();
+    </action>
+
+    <action name="updatedescription">
+        copy(temph,layer[image_description].pixelheight);
+        add(temph,46);
+        sub(imgheight,layer[galleryimage].pixelheight,40);
+        if(temph GT imgheight,copy(temph,imgheight));
+        copy(layer[imagedescriptionbg].openheight,temph);
+        if(layer[galleryimage].descropened, copy(layer[imagedescriptionbg].height,temph); );
+        sub(layer[image_description_stage].height,temph,46);
+    </action>
+
+    <action name="showdescription">
+        if(layer[galleryimage].descropened,
+            set(layer[galleryimage].descropened,false);
+            tween(layer[imagedescriptionbg].height,38,0.2,linear,);
+        ,
+            set(layer[galleryimage].descropened,true);
+            tween(layer[imagedescriptionbg].height,get(layer[imagedescriptionbg].openheight),0.2,linear,);
+        );
+    </action>
+
+
+    <action name="showgallery"> 
+        if(autorotate.enabled,
+            copy(oldrotspeed,autorotate.speed);
+            tween(autorotate.speed,0,0.1,linear, 
+                set(rotenabled,true); 
+                set(autorotate.enabled,false); 
+            );
+        ,
+            set(rotenabled,false); 
+        );
+        if(gallery[%1].thumb.count LT 2,
+            set(plugin[gallerythumbsbg].visible,false);
+            set(plugin[gallerynext].visible,false);
+            set(plugin[galleryprev].visible,false);
+        ,
+            set(plugin[gallerythumbsbg].visible,true);
+            set(plugin[gallerynext].visible,true);
+            set(plugin[galleryprev].visible,true);
+        );
+        set(plugin[gallerythumbsbg].curthumbs,%1);
+        set(plugin[gallerystage].curgallery,%1);        
+        for(set(i,0), i LT gallery.count, inc(i), ifnot(gallery[get(i)].name == %1, set(plugin[get(gallery[get(i)].name)].visible,false); ); );
+        set(plugin[%1].visible,true);
+        set(plugin[galleryimage].alpha,0);
+        tween(plugin[gallerystage].alpha,1,0.3,easeOutQuad,
+            showimage(%1,get(gallery[%1].imgactive));
+            if(isandroid, set(plugin[galleryoverlay].alpha,1);
+                , tween(plugin[galleryoverlay].alpha,1,0.3,easeOutQuad); );
+            tween(plugin[gallerybtnsstage].alpha,1,0.3,easeOutQuad);
+        );
+    </action>
+    
+    <action name="resizethumbs">
+        mul(maxthumbsw,stagewidth,0.8);
+        if(maxthumbsw GT 550, set(maxthumbsw,550); );
+        copy(plugin[gallerythumbsbg].width,maxthumbsw);
+        txtadd(thumbsbar,get(plugin[gallerythumbsbg].curthumbs),_bar);
+        if(plugin[get(thumbsbar)].pixelwidth LT maxthumbsw,
+            set(plugin[thumbssideleft].visible,false);
+            set(plugin[thumbssideright].visible,false);
+        ,
+            set(plugin[thumbssideleft].visible,true);
+            set(plugin[thumbssideright].visible,true);
+        );        
+    </action>
+    
+    <action name="prevnextimage">
+        copy(galleryname,plugin[gallerystage].curgallery);
+        add(imgindex,gallery[get(galleryname)].imgactive,%1);
+        sub(imgmaxindex,gallery[get(galleryname)].thumb.count,1);
+        if(imgindex GT imgmaxindex,
+            set(imgindex,0);
+        ,
+            if(imgindex LT 0, copy(imgindex,imgmaxindex););
+        );
+        showimage(get(galleryname),get(imgindex));
+        
+    </action>
+    
+    <action name="showimage">
+        ifnot(plugin[galleryimage].url == gallery[%1].thumb[%2].imgurl,
+            set(plugin[imageloading].alpha,1);
+            set(gallery[%1].imgactive,%2);
+
+            copy(plugin[galleryimage].caption,gallery[%1].thumb[%2].caption);
+            copy(plugin[galleryimage].caption_width,gallery[%1].thumb[%2].caption_width);
+            copy(plugin[galleryimage].descr_css,gallery[%1].thumb[%2].descr_css);
+            copy(plugin[galleryimage].descr_html,gallery[%1].thumb[%2].descr_html);
+            set(plugin[galleryimage].descropened,false);
+            set(layer[imagedescriptionbg].visible,false);
+
+            if(isandroid,
+                copy(plugin[galleryimage].url,gallery[%1].thumb[%2].imgurl);
+                set(plugin[galleryimage].onloaded,showimage-onloaded());
+            ,
+                tween(plugin[galleryimage].alpha,0,0.2,easeOutQuad,
+                    copy(plugin[galleryimage].url,gallery[%1].thumb[%2].imgurl);
+                    set(plugin[galleryimage].onloaded,resizethumbs();thumbnails.setactive(%1,%2);showimage-onloaded());
+                );
+            );
+        ,
+            resizethumbs();thumbnails.setactive(%1,%2);showimage-onloaded(%1,%2);
+        );
+    </action>
+        
+    <action name="showimage-onloaded">
+        if(plugin[galleryimage].loaded,
+            set(plugin[imageloading].alpha,0);
+            set(tdelay,0.2);
+            mul(maxw,stagewidth,0.7);
+            mul(maxh,stageheight,0.6);
+            copy(iwidth,plugin[galleryimage].imagewidth);
+            copy(iheight,plugin[galleryimage].imageheight);
+            if(plugin[galleryimage].imagewidth GT maxw,        
+                div(aspect,iheight,iwidth);
+                copy(iwidth,maxw);
+                mul(iheight,iwidth,aspect);
+            );
+            ifnot(iheight LT maxh,                        
+                div(aspect,iwidth,iheight);
+                copy(iheight,maxh);
+                mul(iwidth,iheight,aspect);
+            );
+            copy(plugin[galleryimage].width,iwidth);
+            copy(plugin[galleryimage].height,iheight);
+            if(plugin[galleryimage].alpha == 1, set(tdelay,0); );
+            add(tvar,iwidth,12);
+            tween(plugin[gallerystage].width,get(tvar),get(tdelay),easeOutQuad);
+            add(tvar,iheight,12);
+            tween(plugin[gallerystage].height,get(tvar),get(tdelay),easeOutQuad,                
+                setdescription();
+                tween(plugin[gallerythumbsbg].alpha,1,0.3,easeOutQuad);
+                tween(plugin[galleryimage].alpha,1,0.2,easeOutQuad);
+            );
+        );
+    </action>
+        
+    <action name="closegallery">
+        if(rotenabled,
+            set(rotenabled,false);
+            set(autorotate.enabled,true);
+            tween(autorotate.speed,get(oldrotspeed),0.1,linear,);
+        );
+        tween(plugin[gallerystage].alpha,0,0.15,easeOutQuad,
+            tween(plugin[galleryoverlay].alpha,0,easeOutQuad),
+            set(plugin[gallerythumbsbg].alpha,0);
+        );
+    </action>
+
+</krpano>
